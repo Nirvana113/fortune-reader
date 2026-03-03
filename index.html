@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chinese Fortune Reader</title>
+<style>
+* {margin: 0;padding: 0;box-sizing: border-box}
+body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);min-height: 100vh;display: flex;justify-content: center;align-items: center;padding: 20px}
+.container {background: rgba(255,255,255,0.95);border-radius: 20px;padding: 40px;max-width: 500px;width: 100%;box-shadow: 0 20px 60px rgba(0,0,0,0.3)}
+h1 {text-align: center;color: #8B0000;margin-bottom: 10px}
+.form-group {margin-bottom: 20px}
+label {display: block;margin-bottom: 8px;color: #333;font-weight: 600}
+input,select {width: 100%;padding: 12px;border: 2px solid #ddd;border-radius: 10px;font-size: 16px}
+button {width: 100%;padding: 15px;background: linear-gradient(135deg, #8B0000, #CD5C5C);color: white;border: none;border-radius: 10px;font-size: 18px;font-weight: bold;cursor: pointer}
+.result {margin-top: 30px;display: none;background: #fff;padding: 20px;border-radius: 15px}
+.result h2 {color: #8B0000;text-align: center;margin-bottom: 15px}
+.result .info {margin-bottom: 10px;padding: 8px;background: #f9f9f9;border-radius: 8px}
+.result .label {font-weight: bold;color: #8B0000}
+.result .section {margin-top: 12px;padding: 12px;background: #fff5f5;border-radius: 8px;border-left: 3px solid #8B0000}
+.disclaimer {text-align: center;margin-top: 20px;font-size: 12px;color: #999}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🌟 Chinese Fortune Reader 🌟</h1>
+<div class="form-group"><label>Birth Year</label><input type="number" id="year" placeholder="1990" min="1900" max="2025"></div>
+<div class="row"><div class="form-group"><label>Month</label><select id="month"><option value="">Select</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+<div class="form-group"><label>Day</label><input type="number" id="day" placeholder="1-31" min="1" max="31"></div></div>
+<div class="form-group"><label>Birth Hour (0-23)</label><input type="number" id="hour" placeholder="9" min="0" max="23"></div>
+<button onclick="calculate()">🔮 Get My Fortune</button>
+<div class="result" id="result">
+<h2>🌟 Your Fortune 🌟</h2>
+<div class="info"><span class="label">Chinese Zodiac:</span> <span id="zodiac"></span> (<span id="zodiacCn"></span>)</div>
+<div class="info"><span class="label">Element:</span> <span id="element"></span></div>
+<div class="info"><span class="label">Western Sign:</span> <span id="western"></span></div>
+<div class="section"><b>Personality:</b> <span id="personality"></span></div>
+<div class="section"><b>Career:</b> <span id="career"></span></div>
+<div class="section"><b>Wealth:</b> <span id="wealth"></span></div>
+<div class="section"><b>Love:</b> <span id="love"></div>
+<div class="section"><b>2026 Forecast:</b> <span id="forecast"></span></div>
+<div class="info"><b>Lucky Numbers:</b> <span id="lucky"></span></div>
+</div>
+<p class="disclaimer">For entertainment only.</p >
+</div>
+<script>
+const ze=["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
+const zc=["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+const el=["Wood","Fire","Earth","Metal","Water"];
+const pers=["Creative","Wise","Courageous","Compassionate","Leader","Diplomatic","Analytical","Spiritual"];
+const carr=["Creative Field","Leadership","Technical","Helping","Business","Academic"];const wlth=["Steady","Investment","Profit","Advancement","Opportunity","Wisdom"];
+const luv=["Adventure","Stable","Self-love","New","Deep","Travel"];
+const fore=["Transformation","Growth","Opportunities","Relationships","Advancement","Reflection"];
+function gZ(y){return[ze[(y-1900)%12],zc[(y-1900)%12]];}
+function gE(y){let i=(y-1900)%10;return el[i<5?Math.floor(i/2):Math.floor((i-5)/2)+2];}
+function gW(m,d){
+const s=[{s:"Capricorn",e:1,ed:19},{s:"Aquarius",e:1,ed:20},{s:"Pisces",e:2,ed:19},{s:"Aries",e:3,ed:20},{s:"Taurus",e:4,ed:20},{s:"Gemini",e:5,ed:20},{s:"Cancer",e:6,ed:21},{s:"Leo",e:7,ed:22},{s:"Virgo",e:8,ed:22},{s:"Libra",e:9,ed:22},{s:"Scorpio",e:10,ed:22},{s:"Sagittarius",e:11,ed:21}];
+for(let x of s){if(m<x.e||(m==x.e&&d<=x.ed))return x.s;}return"Capricorn";}
+function gT(h){return["子时","丑时","寅时","卯时","辰时","巳时","午时","未时","申时","酉时","戌时","亥时"][Math.floor((h+1)/2)%12];}
+function seed(y,m,d,h){let s=""+y+m+d+h;let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i);return Math.abs(h);}
+function pick(a,s){return a[Math.abs(s)%a.length];}
+function calculate(){
+let y=parseInt(document.getElementById('year').value);
+let m=parseInt(document.getElementById('month').value);
+let d=parseInt(document.getElementById('day').value);
+let h=parseInt(document.getElementById('hour').value)||12;
+if(!y||!m||!d){alert("Please fill all fields!");return;}
+let s=seed(y,m,d,h);let z=gZ(y);
+document.getElementById('zodiac').innerText=z[0];
+document.getElementById('zodiacCn').innerText=z[1];
+document.getElementById('element').innerText=gE(y);
+document.getElementById('western').innerText=gW(m,d);
+document.getElementById('personality').innerText=pick(pers,s);
+document.getElementById('career').innerText=pick(carr,s+1);
+document.getElementById('wealth').innerText=pick(wlth,s+2);
+document.getElementById('love').innerText=pick(luv,s+3);
+document.getElementById('forecast').innerText=pick(fore,s+5);
+let n=[];for(let i=0;i<5;i++)n.push((Math.abs(s*i)%99)+1);
+document.getElementById('lucky').innerText=n.join(" - ");
+document.getElementById('result').style.display="block";}
+</script>
+</body>
+</html>

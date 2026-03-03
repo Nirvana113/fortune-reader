@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "api/fortune.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/fortune",
+      "dest": "/api/fortune.py"
+    }
+  ]
+}
